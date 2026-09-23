@@ -12,9 +12,11 @@ this task. The owner-approved Space is `fumppun` in `lon1`.
    proposed web service. No port, health endpoint or database is needed.
 3. Choose **London**, one **512 MiB shared CPU** instance at **$5/month**. Disable
    automatic deployment on push for this fixed research run.
-4. Copy the environment settings from `deploy/pump-worker.yaml`. Supply the three
-   secret values from your local environment, mark each **Encrypt**, and use runtime
-   scope. Set the termination grace period to **180 seconds** through the App spec.
+4. Supply the three secret values from your local environment, mark each
+   **Encrypt**, and use runtime scope. The Dockerfile already supplies the approved
+   bucket, region, prefix, run ID and Mayhem setting. `deploy/pump-worker.yaml`
+   repeats these settings explicitly. Set the termination grace period to
+   **180 seconds** through the App spec.
 5. Deploy. Runtime logs should show `worker_started`, `subscribed`, then
    `chunk_durable`. Confirm that the corresponding prefix appears in `fumppun`.
 
@@ -41,8 +43,9 @@ For another paid, bounded local validation with the configured credentials:
 `.venv/bin/python validate_collector_live.py` (five minutes; writes to the Space).
 Tests: `.venv/bin/python -m unittest test_collector.py test_ws_probe.py`.
 This engineering test command is for the original local research workspace;
-the test scripts and saved historical fixtures are not in the deployment-only
-repository. The standalone live validation scripts are included in the repository.
+those fixture-based tests and saved historical fixtures are not in the deployment-only
+repository. The standalone live validation scripts are included, along with
+network-free startup checks: `.venv/bin/python -m unittest test_collector_config.py`.
 
 ## DigitalOcean configuration
 
@@ -63,10 +66,19 @@ Set these component variables as **encrypted secrets**, runtime scope:
 | `SPACES_ACCESS_KEY_ID` | Scoped fumppun Spaces access key |
 | `SPACES_SECRET_ACCESS_KEY` | Matching Spaces secret |
 
+App-level secrets are also inherited by the Worker. A component variable with
+the same name takes precedence, including a blank value; avoid blank duplicates.
+
 Their values are deliberately omitted from the App spec. Enter them in the
 DigitalOcean environment panel before deployment. `.env.local` is only for local
 validation and is excluded from the Docker context. No DigitalOcean API token
 is required for the owner to connect and deploy the repository in the control panel.
+
+If startup reports `MissingEnvironment`, its `missing_environment_variables`
+list names the settings to correct. It never prints their values. A generic
+`KeyError` from the first deployment may mean the non-secret settings were not
+entered; deploy the latest commit to pick up the Dockerfile defaults. App Platform
+environment values override image defaults, so remove or correct blank overrides.
 
 Non-secret settings already in the spec:
 

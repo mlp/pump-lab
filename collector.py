@@ -29,6 +29,12 @@ MAX_MESSAGE_BYTES = 2*1024*1024
 MAX_DEDUPE = 100_000
 MAX_ENRICH_QUEUE = 128
 COLLECTOR_SHA256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+REQUIRED_ENVIRONMENT = ('HELIUS','SPACES_ACCESS_KEY_ID','SPACES_SECRET_ACCESS_KEY',
+                        'SPACES_BUCKET','SPACES_REGION','PUMP_RUN_ID')
+
+
+def missing_environment(settings):
+    return [key for key in REQUIRED_ENVIRONMENT if not settings.get(key,'').strip()]
 
 
 def log(kind, **fields):
@@ -445,9 +451,16 @@ class Worker:
 
 if __name__=='__main__':
     logging.getLogger('websockets').setLevel(logging.CRITICAL)
+    settings=dict(os.environ)
+    missing=missing_environment(settings)
+    if missing:
+        log('fatal',error_type='MissingEnvironment',missing_environment_variables=missing)
+        raise SystemExit(1)
     try:
-        settings=dict(os.environ)
         asyncio.run(Worker(settings,Spaces(settings)).run())
     except Exception as exc:
-        log('fatal',error_type=type(exc).__name__)
+        detail={}
+        if isinstance(exc,KeyError) and exc.args and exc.args[0] in REQUIRED_ENVIRONMENT+('stop_at_utc','idl_sha256'):
+            detail['missing_key']=exc.args[0]
+        log('fatal',error_type=type(exc).__name__,**detail)
         raise SystemExit(1)
