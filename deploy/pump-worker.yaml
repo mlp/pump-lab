@@ -1,0 +1,48 @@
+# One 24-hour run. Its deadline is persisted in Spaces at first startup.
+# Set secret VALUES in the DigitalOcean control panel; never put them in this file.
+name: pump-lab-research
+region: lon
+workers:
+  - name: pump-collector
+    github:
+      repo: mlp/pump-lab
+      branch: master
+      deploy_on_push: false
+    dockerfile_path: Dockerfile.collector
+    source_dir: /
+    run_command: python -u collector.py
+    instance_count: 1
+    instance_size_slug: apps-s-1vcpu-0.5gb
+    termination:
+      grace_period_seconds: 180
+    envs:
+      - key: HELIUS
+        type: SECRET
+        scope: RUN_TIME
+      - key: SPACES_ACCESS_KEY_ID
+        type: SECRET
+        scope: RUN_TIME
+      - key: SPACES_SECRET_ACCESS_KEY
+        type: SECRET
+        scope: RUN_TIME
+      - key: SPACES_BUCKET
+        scope: RUN_TIME
+        value: fumppun
+      - key: SPACES_REGION
+        scope: RUN_TIME
+        value: lon1
+      - key: SPACES_PREFIX
+        scope: RUN_TIME
+        value: pump-lab/prospective
+      - key: PUMP_RUN_ID
+        scope: RUN_TIME
+        value: pump-24h-20260923
+      - key: PUMP_MAX_RECEIVED_BYTES
+        scope: RUN_TIME
+        value: "40000000000"
+      - key: PUMP_MAX_ENRICHMENT_REQUESTS
+        scope: RUN_TIME
+        value: "100000"
+      - key: PUMP_EXCLUDE_MAYHEM
+        scope: RUN_TIME
+        value: "1"
