@@ -12,7 +12,7 @@ There is no API, frontend, database or trading integration.
 - [Live validation and cost evidence](reports/2026-09-23-live-collector.md)
 - [Why standard logs cost less in our comparison](reports/2026-09-23-subscription-comparison.md)
 - App spec: `deploy/pump-worker.yaml`
-- Dockerfile: `Dockerfile.collector`
+- Dockerfile: `Dockerfile`
 - Run command: `python -u collector.py`
 
 Secrets belong in DigitalOcean **encrypted runtime environment variables**.

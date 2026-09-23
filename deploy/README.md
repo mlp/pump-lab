@@ -7,7 +7,7 @@ this task. The owner-approved Space is `fumppun` in `lon1`.
 ## Quick setup in App Platform
 
 1. Create an app from GitHub repository `mlp/pump-lab`, branch `master`.
-2. Configure **one Worker**, with Dockerfile path `Dockerfile.collector`, source
+2. Configure **one Worker**, with Dockerfile path `Dockerfile`, source
    directory `/`, and run command `python -u collector.py`. Remove any automatically
    proposed web service. No port, health endpoint or database is needed.
 3. Choose **London**, one **512 MiB shared CPU** instance at **$5/month**. Disable
@@ -30,7 +30,7 @@ fetch transactions whose logs are incomplete. No Bitquery key is used by the Wor
 - `collector.py`, `ws_probe.py`, `decode.py`
 - `sources/pump.json` (pinned official IDL)
 - `requirements-collector.txt`
-- `Dockerfile.collector`, `.dockerignore`
+- `Dockerfile`, `.dockerignore`
 - `deploy/pump-worker.yaml`
 
 Run command: `python -u collector.py`.

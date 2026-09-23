@@ -8,7 +8,7 @@ workers:
       repo: mlp/pump-lab
       branch: master
       deploy_on_push: false
-    dockerfile_path: Dockerfile.collector
+    dockerfile_path: Dockerfile
     source_dir: /
     run_command: python -u collector.py
     instance_count: 1
